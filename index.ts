@@ -15,22 +15,28 @@
  */
 
 import {app, BrowserWindow, ipcMain} from 'electron';
-import url = require('url');
 import path = require('path');
 import {log} from './logger';
 
 // retain a reference to the window, otherwise it gets gc-ed
-let w: Electron.BrowserWindow|null = null;
+let w: Electron.BrowserWindow | null = null;
 
 function createWindow(): Electron.BrowserWindow {
   log('Creating window.');
-  w = new BrowserWindow(
-      {width: 1280, height: 720, icon: 'assets/app_icon.png'});
-  w.loadURL(url.format({
-    pathname: path.join(path.dirname(__dirname), 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
+  w = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    icon: 'assets/app_icon.png',
+    webPreferences: {
+      webSecurity: false,
+      contextIsolation: false,
+      nodeIntegration: true,
+      webviewTag: true,
+      enableRemoteModule: true,
+      spellcheck: false,
+    },
+  });
+  w.loadURL(`file://${path.join(path.dirname(__dirname), 'index.html')}`);
   w.on('close', () => {
     // allow window to be gc-ed
     w = null;
